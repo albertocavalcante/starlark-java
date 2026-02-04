@@ -1,0 +1,20 @@
+# Root BUILD file for Starlark Java
+#
+# This file configures Gazelle for Java BUILD file generation.
+# Run bazelle to regenerate BUILD files after syncing from upstream.
+
+# Gazelle configuration for Java
+# gazelle:prefix github.com/albertocavalcante/starlark-java
+# gazelle:java_maven_install_file maven_install.json
+
+# Resolve Maven dependencies to @maven repository
+# gazelle:resolve java com.google.guava:guava @maven//:com_google_guava_guava
+# gazelle:resolve java com.google.code.findbugs:jsr305 @maven//:com_google_code_findbugs_jsr305
+# gazelle:resolve java com.google.auto.value:auto-value-annotations @maven//:com_google_auto_value_auto_value_annotations
+# gazelle:resolve java com.google.flogger:flogger @maven//:com_google_flogger_flogger
+# gazelle:resolve java com.google.errorprone:error_prone_annotations @maven//:com_google_errorprone_error_prone_annotations
+
+exports_files([
+    "LICENSE",
+    "LICENSE-bazel",
+])

@@ -1,0 +1,47 @@
+"""
+Starlark Java - Standalone Starlark interpreter for Java.
+
+Synced from bazelbuild/bazel's net.starlark.java packages.
+This module provides a Bazel-independent Starlark implementation.
+"""
+
+module(
+    name = "starlark-java",
+    # Version is managed via git tags, not this file.
+    # Consumers use git_override/archive_override, not BCR.
+)
+
+# ==============================================================================
+# Core Dependencies
+# ==============================================================================
+bazel_dep(name = "rules_java", version = "8.12.0")
+bazel_dep(name = "rules_jvm_external", version = "6.9")
+
+# ==============================================================================
+# Maven Dependencies
+# ==============================================================================
+# These match the dependencies in build.gradle.kts and Bazel's BUILD files.
+# The upstream code explicitly avoids Bazel-specific dependencies.
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = [
+        # Core
+        "com.google.guava:guava:33.0.0-jre",
+        "com.google.code.findbugs:jsr305:3.0.2",
+        # Annotation processing
+        "com.google.auto.value:auto-value:1.10.4",
+        "com.google.auto.value:auto-value-annotations:1.10.4",
+        # Logging
+        "com.google.flogger:flogger:0.8",
+        "com.google.flogger:flogger-system-backend:0.8",
+        # Error Prone
+        "com.google.errorprone:error_prone_annotations:2.24.1",
+        # Testing
+        "junit:junit:4.13.2",
+        "com.google.truth:truth:1.1.5",
+    ],
+    fail_if_repin_required = True,
+    lock_file = "//:maven_install.json",
+)
+use_repo(maven, "maven")
