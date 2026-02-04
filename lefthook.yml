@@ -19,10 +19,12 @@ pre-commit:
     copybara-validate:
       glob: '.copybara/copy.bara.sky'
       run: |
-        if command -v java &> /dev/null && [ -f /tmp/copybara_deploy.jar ]; then
+        if command -v just &> /dev/null; then
+          just validate-copybara
+        elif command -v java &> /dev/null && [ -f /tmp/copybara_deploy.jar ]; then
           java -jar /tmp/copybara_deploy.jar validate .copybara/copy.bara.sky
         else
-          echo "Skipping Copybara validation (jar not found)"
+          echo "Skipping Copybara validation (just or copybara jar not found)"
         fi
 
 commit-msg:
