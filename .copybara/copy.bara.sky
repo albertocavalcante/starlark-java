@@ -1,0 +1,112 @@
+# ==============================================================================
+# .copybara/copy.bara.sky
+#
+# Copybara configuration for syncing Starlark Java from bazelbuild/bazel.
+#
+# WORKFLOW:
+#   - sync-starlark-java: bazelbuild/bazel → net/starlark/java/
+#
+# SOURCE:
+#   The Java Starlark interpreter is designed to be Bazel-independent.
+#   BUILD files explicitly state: "Do not add Bazel or Google dependencies here!"
+#
+# COPYBARA REFERENCE:
+#   - https://github.com/google/copybara/blob/master/docs/reference.md
+# ==============================================================================
+
+defaultAuthor = authoring.pass_thru("Eukia[bot] <eukia[bot]@users.noreply.github.com>")
+
+core.workflow(
+    name = "sync-starlark-java",
+
+    origin = git.origin(
+        url = "https://github.com/bazelbuild/bazel.git",
+        ref = "master",
+    ),
+
+    destination = git.github_destination(
+        url = "https://github.com/albertocavalcante/starlark-java.git",
+        push = "main",
+    ),
+
+    origin_files = glob(
+        include = [
+            # Java source files
+            "src/main/java/net/starlark/java/annot/**/*.java",
+            "src/main/java/net/starlark/java/eval/**/*.java",
+            "src/main/java/net/starlark/java/spelling/**/*.java",
+            "src/main/java/net/starlark/java/syntax/**/*.java",
+            # BUILD files for Bazel users
+            "src/main/java/net/starlark/java/**/BUILD",
+            # License
+            "LICENSE",
+        ],
+        exclude = [
+            # Exclude tests (different directory in Bazel)
+            "**/*Test.java",
+            "**/*_test.java",
+            "**/testing/**",
+            # Exclude lib/json (has Bazel coupling)
+            "**/lib/json/**",
+            # Exclude cmd (standalone REPL, can add later)
+            "**/cmd/**",
+            # Exclude native profiler C++ code
+            "**/*.cc",
+        ],
+    ),
+
+    destination_files = glob(
+        include = ["src/**", "LICENSE-bazel"],
+        exclude = [
+            # Preserve our own files
+            "src/main/java/net/starlark/java/**/package-info.java",
+        ],
+    ),
+
+    mode = "ITERATIVE",
+    authoring = defaultAuthor,
+
+    transformations = [
+        # Move LICENSE to avoid conflict with our own
+        core.move("LICENSE", "LICENSE-bazel"),
+
+        # Fix BUILD file paths (Bazel's third_party -> our deps)
+        # These will need manual adjustment for standalone use
+        core.replace(
+            before = "//third_party:guava",
+            after = "@maven//:com_google_guava_guava",
+            paths = glob(["**/BUILD"]),
+        ),
+        core.replace(
+            before = "//third_party:jsr305",
+            after = "@maven//:com_google_code_findbugs_jsr305",
+            paths = glob(["**/BUILD"]),
+        ),
+        core.replace(
+            before = "//third_party:auto_value",
+            after = "@maven//:com_google_auto_value_auto_value",
+            paths = glob(["**/BUILD"]),
+        ),
+        core.replace(
+            before = "//third_party:flogger",
+            after = "@maven//:com_google_flogger_flogger",
+            paths = glob(["**/BUILD"]),
+        ),
+        core.replace(
+            before = "//third_party:error_prone_annotations",
+            after = "@maven//:com_google_errorprone_error_prone_annotations",
+            paths = glob(["**/BUILD"]),
+        ),
+
+        # Fix internal package references
+        core.replace(
+            before = "//src/main/java/net/starlark/java/",
+            after = "//src/main/java/net/starlark/java/",
+            paths = glob(["**/BUILD"]),
+        ),
+
+        metadata.expose_label("Co-authored-by"),
+        metadata.expose_label("Signed-off-by"),
+        metadata.add_header("Synced-From: bazelbuild/bazel/src/main/java/net/starlark/java"),
+    ],
+)

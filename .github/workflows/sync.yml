@@ -1,0 +1,129 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sundays
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (validate only, no push)'
+        type: boolean
+        default: false
+      init_history:
+        description: 'Initialize history (first-time sync)'
+        type: boolean
+        default: false
+      force:
+        description: 'Force push (dangerous)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  COPYBARA_VERSION: "20251215"
+
+jobs:
+  sync:
+    name: Sync from Bazel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Eukia App Token
+        id: eukia
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.EUKIA_APP_ID }}
+          private-key: ${{ secrets.EUKIA_APP_PRIVATE_KEY }}
+          owner: albertocavalcante
+          repositories: starlark-java
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.eukia.outputs.token }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Copybara JAR
+        id: cache-copybara
+        uses: actions/cache@v4
+        with:
+          path: /tmp/copybara_deploy.jar
+          key: copybara-${{ env.COPYBARA_VERSION }}
+
+      - name: Download Copybara
+        if: steps.cache-copybara.outputs.cache-hit != 'true'
+        run: |
+          curl -fsSL -o /tmp/copybara_deploy.jar \
+            "https://github.com/google/copybara/releases/download/v${COPYBARA_VERSION}/copybara_deploy.jar"
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Eukia[bot]"
+          git config --global user.email "eukia[bot]@users.noreply.github.com"
+          git config --global credential.helper store
+          echo "https://x-access-token:${{ steps.eukia.outputs.token }}@github.com" > ~/.git-credentials
+
+      - name: Run Copybara (Validate)
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          java -jar /tmp/copybara_deploy.jar validate \
+            .copybara/copy.bara.sky
+
+      - name: Build Copybara flags
+        id: flags
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          FLAGS=""
+          if [[ "${{ inputs.init_history }}" == "true" ]]; then
+            FLAGS="$FLAGS --init-history"
+          fi
+          if [[ "${{ inputs.force }}" == "true" ]]; then
+            FLAGS="$FLAGS --force"
+          fi
+          echo "flags=$FLAGS" >> "$GITHUB_OUTPUT"
+
+      # COPYBARA EXIT CODE HANDLING:
+      # Exit code 4 (NO_OP) occurs when there are no upstream changes to sync.
+      # This is thrown as EmptyChangeException in Copybara's Main.java and ALWAYS
+      # returns exit code 4, regardless of flags. The --ignore-noop flag only
+      # affects VoidOperationException (transform-level noops), not empty migrations.
+      # Therefore, we explicitly handle exit code 4 as success.
+      # See: github.com/google/copybara Main.java and ExitCode.java
+      - name: Sync Starlark Java
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          java -jar /tmp/copybara_deploy.jar migrate \
+            .copybara/copy.bara.sky \
+            sync-starlark-java \
+            ${{ steps.flags.outputs.flags }} \
+          && exit 0 || { rc=$?; [[ $rc -eq 4 ]] && echo "No changes to sync" && exit 0 || exit $rc; }
+
+  validate:
+    name: Validate Build
+    runs-on: ubuntu-latest
+    needs: sync
+    if: ${{ inputs.dry_run != true }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build
+        run: ./gradlew build
