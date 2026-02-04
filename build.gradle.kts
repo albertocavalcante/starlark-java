@@ -16,23 +16,23 @@ java {
 
 dependencies {
     // Core dependencies (from Bazel's BUILD files)
-    api("com.google.guava:guava:33.0.0-jre")
-    api("com.google.code.findbugs:jsr305:3.0.2")
+    api(libs.guava)
+    api(libs.jsr305)
 
     // Annotation processing
-    api("com.google.auto.value:auto-value-annotations:1.10.4")
-    annotationProcessor("com.google.auto.value:auto-value:1.10.4")
+    api(libs.auto.value.annotations)
+    annotationProcessor(libs.auto.value)
 
     // Logging
-    implementation("com.google.flogger:flogger:0.8")
-    runtimeOnly("com.google.flogger:flogger-system-backend:0.8")
+    implementation(libs.flogger)
+    runtimeOnly(libs.flogger.backend)
 
     // Error Prone annotations
-    implementation("com.google.errorprone:error_prone_annotations:2.24.1")
+    implementation(libs.errorprone.annotations)
 
     // Testing
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("com.google.truth:truth:1.1.5")
+    testImplementation(libs.junit)
+    testImplementation(libs.truth)
 }
 
 tasks.withType<JavaCompile> {

@@ -20,7 +20,7 @@ bazel_dep(name = "rules_jvm_external", version = "6.9")
 # ==============================================================================
 # Maven Dependencies
 # ==============================================================================
-# These match the dependencies in build.gradle.kts and Bazel's BUILD files.
+# Keep versions in sync with gradle/libs.versions.toml (source of truth).
 # The upstream code explicitly avoids Bazel-specific dependencies.
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
