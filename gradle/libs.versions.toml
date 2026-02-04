@@ -23,7 +23,8 @@ errorprone = "2.24.1"
 
 # Testing
 junit = "4.13.2"
-truth = "1.1.5"
+truth = "1.4.4"
+test-parameter-injector = "1.18"
 
 [libraries]
 # Core
@@ -44,3 +45,5 @@ errorprone-annotations = { module = "com.google.errorprone:error_prone_annotatio
 # Testing
 junit = { module = "junit:junit", version.ref = "junit" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
+guava-testlib = { module = "com.google.guava:guava-testlib", version.ref = "guava" }
+test-parameter-injector = { module = "com.google.testparameterinjector:test-parameter-injector", version.ref = "test-parameter-injector" }

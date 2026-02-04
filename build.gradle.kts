@@ -34,6 +34,14 @@ dependencies {
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.truth)
+    testImplementation(libs.guava.testlib)
+    testImplementation(libs.test.parameter.injector)
+}
+
+tasks.test {
+    // StarlarkListTest.concat_failsCleanlyOnOverflow() needs at least 4GB of max heap
+    maxHeapSize = "4g"
+    jvmArgs("-Dfile.encoding=UTF8")
 }
 
 tasks.withType<JavaCompile> {
