@@ -1,0 +1,37 @@
+pre-commit:
+  commands:
+    branch-check:
+      run: |
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        if [ "$branch" = "main" ]; then
+          echo "Direct commits to main branch are forbidden!"
+          exit 1
+        fi
+    gradle-check:
+      glob: '**/*.{java,kt,kts}'
+      run: ./gradlew check --dry-run
+    yaml-lint:
+      glob: '**/*.{yml,yaml}'
+      run: yq '.' {staged_files} > /dev/null
+    workflow-lint:
+      glob: '.github/workflows/*.{yml,yaml}'
+      run: actionlint {staged_files}
+    copybara-validate:
+      glob: '.copybara/copy.bara.sky'
+      run: |
+        if command -v java &> /dev/null && [ -f /tmp/copybara_deploy.jar ]; then
+          java -jar /tmp/copybara_deploy.jar validate .copybara/copy.bara.sky
+        else
+          echo "Skipping Copybara validation (jar not found)"
+        fi
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: |
+        commit_msg=$(head -n1 {1})
+        if ! echo "$commit_msg" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: .+$"; then
+          echo "Error: Commit message does not follow conventional commits format."
+          echo "Example: feat(api): add new endpoint"
+          exit 1
+        fi
