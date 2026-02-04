@@ -22,6 +22,11 @@ bazel_dep(name = "rules_jvm_external", version = "6.9")
 # ==============================================================================
 # Keep versions in sync with gradle/libs.versions.toml (source of truth).
 # The upstream code explicitly avoids Bazel-specific dependencies.
+#
+# DEPENDENCY VERSIONS
+# Currently frozen - no automated sync with bazelbuild/bazel's third_party.
+# TODO(#5): Evaluate automated upstream version synchronization.
+# See: .github/issues/001-upstream-dependency-sync.md
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(

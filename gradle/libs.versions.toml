@@ -1,5 +1,11 @@
 # Gradle Version Catalog
 # https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
+#
+# DEPENDENCY VERSIONS
+# These versions are manually aligned with bazelbuild/bazel's third_party deps.
+# Currently frozen - no automated sync with upstream.
+# TODO(#5): Evaluate automated upstream version synchronization.
+# See: .github/issues/001-upstream-dependency-sync.md
 
 [versions]
 # Core
