@@ -31,15 +31,23 @@ core.workflow(
 
     origin_files = glob(
         include = [
-            # Main sources
+            # Main sources - include both direct files and subdirectory files
+            "src/main/java/net/starlark/java/annot/*.java",
             "src/main/java/net/starlark/java/annot/**/*.java",
+            "src/main/java/net/starlark/java/eval/*.java",
             "src/main/java/net/starlark/java/eval/**/*.java",
+            "src/main/java/net/starlark/java/spelling/*.java",
             "src/main/java/net/starlark/java/spelling/**/*.java",
+            "src/main/java/net/starlark/java/syntax/*.java",
             "src/main/java/net/starlark/java/syntax/**/*.java",
             # Test sources
+            "src/test/java/net/starlark/java/annot/*.java",
             "src/test/java/net/starlark/java/annot/**/*.java",
+            "src/test/java/net/starlark/java/eval/*.java",
             "src/test/java/net/starlark/java/eval/**/*.java",
+            "src/test/java/net/starlark/java/spelling/*.java",
             "src/test/java/net/starlark/java/spelling/**/*.java",
+            "src/test/java/net/starlark/java/syntax/*.java",
             "src/test/java/net/starlark/java/syntax/**/*.java",
             # Test data files (Starlark scripts for testing)
             "src/test/java/net/starlark/java/eval/testdata/**",
