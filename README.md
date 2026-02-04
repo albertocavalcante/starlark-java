@@ -16,23 +16,65 @@ This package extracts the `net.starlark.java` packages for standalone use, stayi
 
 ## Installation
 
-### Gradle
+### Gradle (GitHub Packages)
+
+Add the GitHub Packages repository and dependency:
 
 ```kotlin
+// settings.gradle.kts
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/albertocavalcante/starlark-java")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
+            }
+        }
+    }
+}
+
+// build.gradle.kts
 dependencies {
     implementation("io.github.albertocavalcante:starlark-java:0.1.0")
 }
 ```
 
-### Maven
+### Maven (GitHub Packages)
+
+Add to your `~/.m2/settings.xml`:
 
 ```xml
-<dependency>
+<servers>
+  <server>
+    <id>github</id>
+    <username>YOUR_GITHUB_USERNAME</username>
+    <password>YOUR_GITHUB_TOKEN</password>
+  </server>
+</servers>
+```
+
+Then in your `pom.xml`:
+
+```xml
+<repositories>
+  <repository>
+    <id>github</id>
+    <url>https://maven.pkg.github.com/albertocavalcante/starlark-java</url>
+  </repository>
+</repositories>
+
+<dependencies>
+  <dependency>
     <groupId>io.github.albertocavalcante</groupId>
     <artifactId>starlark-java</artifactId>
     <version>0.1.0</version>
-</dependency>
+  </dependency>
+</dependencies>
 ```
+
+> **Note:** GitHub Packages requires authentication even for public packages. You need a GitHub token with `read:packages` scope.
 
 ### Bazel
 
@@ -105,18 +147,33 @@ try (Mutability mu = Mutability.create("example")) {
 ## Build
 
 ```bash
-# Gradle
+# Build
 ./gradlew build
 
 # Run tests
 ./gradlew test
+
+# Publish to local Maven repository
+./gradlew publishToMavenLocal
 ```
 
 ## Versioning
 
 Versions follow: `v0.YYYYMMDD.N`
 
-See `VERSION.json` for exact upstream commit references.
+See `VERSION.json` for exact upstream commit references (generated after first sync).
+
+## What You Need To Do
+
+To use this package from GitHub Packages, you need:
+
+1. **GitHub Token** with `read:packages` scope
+2. Configure your build tool to authenticate with GitHub Packages (see Installation above)
+
+To publish releases (maintainers only):
+
+1. Push a tag: `git tag v0.20260204.0 && git push --tags`
+2. The release workflow will automatically build and publish to GitHub Packages
 
 ## Acknowledgements
 

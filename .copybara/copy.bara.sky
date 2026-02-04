@@ -98,13 +98,6 @@ core.workflow(
             paths = glob(["**/BUILD"]),
         ),
 
-        # Fix internal package references
-        core.replace(
-            before = "//src/main/java/net/starlark/java/",
-            after = "//src/main/java/net/starlark/java/",
-            paths = glob(["**/BUILD"]),
-        ),
-
         metadata.expose_label("Co-authored-by"),
         metadata.expose_label("Signed-off-by"),
         metadata.add_header("Synced-From: bazelbuild/bazel/src/main/java/net/starlark/java"),

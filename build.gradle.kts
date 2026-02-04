@@ -4,7 +4,8 @@ plugins {
 }
 
 group = "io.github.albertocavalcante"
-version = "0.1.0-SNAPSHOT"
+// Version is set by CI from git tag, or defaults to SNAPSHOT for local builds
+version = System.getenv("VERSION") ?: "0.1.0-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -36,7 +37,8 @@ dependencies {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+    // Remove -Werror for synced code that may have warnings
+    options.compilerArgs.add("-Xlint:all")
 }
 
 tasks.withType<Javadoc> {
@@ -75,6 +77,17 @@ publishing {
                     developerConnection.set("scm:git:ssh://github.com/albertocavalcante/starlark-java.git")
                     url.set("https://github.com/albertocavalcante/starlark-java")
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/albertocavalcante/starlark-java")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: ""
+                password = System.getenv("GITHUB_TOKEN") ?: ""
             }
         }
     }
