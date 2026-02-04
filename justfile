@@ -73,3 +73,17 @@ sync-dry-run: ensure-copybara
 # Run Copybara sync locally (first time with history)
 sync-init: ensure-copybara
     java -jar "{{copybara_jar}}" migrate .copybara/copy.bara.sky sync-starlark-java --init-history
+
+# ==============================================================================
+# Tag Management
+# ==============================================================================
+
+# Create/update pre-sync tag at current commit
+tag-presync:
+    @if git rev-parse pre-sync >/dev/null 2>&1; then \
+        git tag -d pre-sync; \
+        git push origin :refs/tags/pre-sync 2>/dev/null || true; \
+    fi
+    git tag -a pre-sync -m "Repository bootstrap before initial Copybara sync"
+    git push origin pre-sync
+    @echo "pre-sync tag set at $(git rev-parse --short HEAD)"
