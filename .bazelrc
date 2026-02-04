@@ -9,6 +9,3 @@ build --java_runtime_version=21
 
 # Better error messages
 build --verbose_failures
-
-# Lockfile mode: update when deps change, error in CI
-build --lockfile_mode=update

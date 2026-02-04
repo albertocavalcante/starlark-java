@@ -41,7 +41,7 @@ maven.install(
         "junit:junit:4.13.2",
         "com.google.truth:truth:1.1.5",
     ],
-    fail_if_repin_required = True,
-    lock_file = "//:maven_install.json",
+    # Lockfile can be generated with: bazel run @maven//:pin
+    # lock_file = "//:maven_install.json",
 )
 use_repo(maven, "maven")
