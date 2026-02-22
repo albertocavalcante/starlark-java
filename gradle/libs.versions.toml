@@ -37,6 +37,7 @@ auto-value-annotations = { module = "com.google.auto.value:auto-value-annotation
 
 # Logging
 flogger = { module = "com.google.flogger:flogger", version.ref = "flogger" }
+flogger-google-extensions = { module = "com.google.flogger:google-extensions", version.ref = "flogger" }
 flogger-backend = { module = "com.google.flogger:flogger-system-backend", version.ref = "flogger" }
 
 # Static analysis

@@ -26,6 +26,7 @@ dependencies {
 
     // Logging
     implementation(libs.flogger)
+    implementation(libs.flogger.google.extensions)
     runtimeOnly(libs.flogger.backend)
 
     // Error Prone annotations
