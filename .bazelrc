@@ -3,8 +3,8 @@
 # Use bzlmod (default in Bazel 9, but explicit for clarity)
 common --enable_bzlmod
 
-# Java toolchain (upstream uses Java 17+ features)
-build --java_language_version=17
+# Java toolchain (upstream uses Java 21+ features)
+build --java_language_version=21
 build --java_runtime_version=21
 
 # Better error messages

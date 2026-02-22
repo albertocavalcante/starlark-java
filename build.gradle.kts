@@ -8,9 +8,9 @@ group = "io.github.albertocavalcante"
 version = System.getenv("VERSION") ?: "0.1.0-SNAPSHOT"
 
 java {
-    // Upstream uses Java 16+ features (pattern matching in instanceof)
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    // Upstream uses Java 21+ features (pattern matching in switch)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
     withJavadocJar()
 }
